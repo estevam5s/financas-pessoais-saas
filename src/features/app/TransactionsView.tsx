@@ -44,23 +44,23 @@ export default function TransactionsView() {
     <AppShell>
       <div className="space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <div><h1 className="text-2xl font-semibold text-white">Lançamentos</h1><p className="text-slate-400 mt-1 text-sm">Receitas e despesas das suas contas.</p></div>
+          <div><h1 className="text-2xl font-semibold text-foreground">Lançamentos</h1><p className="text-muted-foreground mt-1 text-sm">Receitas e despesas das suas contas.</p></div>
           <button onClick={openNew} className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm flex items-center gap-2"><Plus className="size-4" /> Adicionar</button>
         </div>
 
         {!loaded ? (
-          <div className="flex items-center gap-2 text-slate-500 text-sm"><Loader2 className="size-4 animate-spin" /> Carregando…</div>
+          <div className="flex items-center gap-2 text-muted-foreground text-sm"><Loader2 className="size-4 animate-spin" /> Carregando…</div>
         ) : items.length === 0 ? (
-          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-12 text-center">
-            <p className="text-slate-400">Nenhum lançamento ainda.</p>
+          <div className="rounded-xl border border-border bg-card p-12 text-center">
+            <p className="text-muted-foreground">Nenhum lançamento ainda.</p>
             <button onClick={openNew} className="inline-block mt-3 px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium text-sm hover:bg-emerald-600">+ Adicionar lançamento</button>
           </div>
         ) : (
-          <div className="rounded-xl border border-white/5 bg-white/[0.02] overflow-hidden">
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-[10px] uppercase tracking-widest text-slate-600">
+                  <tr className="text-[10px] uppercase tracking-widest text-muted-foreground">
                     <th className="text-left font-bold px-5 py-3">Data</th>
                     <th className="text-left font-bold px-5 py-3">Descrição</th>
                     <th className="text-left font-bold px-5 py-3">Categoria</th>
@@ -71,15 +71,15 @@ export default function TransactionsView() {
                 </thead>
                 <tbody>
                   {items.map((t) => (
-                    <tr key={t.id} className="border-t border-white/5 hover:bg-white/[0.02]">
-                      <td className="px-5 py-3 text-slate-400">{new Date(t.occurred_at).toLocaleDateString("pt-BR")}</td>
-                      <td className="px-5 py-3 text-white">{t.description || "—"}</td>
-                      <td className="px-5 py-3 text-slate-400">{t.category_name || "—"}</td>
-                      <td className="px-5 py-3 text-slate-400">{t.account_name || "—"}</td>
+                    <tr key={t.id} className="border-t border-border hover:bg-card">
+                      <td className="px-5 py-3 text-muted-foreground">{new Date(t.occurred_at).toLocaleDateString("pt-BR")}</td>
+                      <td className="px-5 py-3 text-foreground">{t.description || "—"}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{t.category_name || "—"}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{t.account_name || "—"}</td>
                       <td className={`px-5 py-3 text-right font-medium ${t.kind === "receita" ? "text-emerald-400" : "text-red-400"}`}>{t.kind === "receita" ? "+" : "−"} {money(Number(t.amount))}</td>
                       <td className="px-5 py-3 text-right whitespace-nowrap">
-                        <button onClick={() => openEdit(t)} className="text-slate-500 hover:text-emerald-400 mr-3"><Pencil className="size-4" /></button>
-                        <button onClick={() => remove(t.id)} className="text-slate-500 hover:text-red-400"><Trash2 className="size-4" /></button>
+                        <button onClick={() => openEdit(t)} className="text-muted-foreground hover:text-emerald-400 mr-3"><Pencil className="size-4" /></button>
+                        <button onClick={() => remove(t.id)} className="text-muted-foreground hover:text-red-400"><Trash2 className="size-4" /></button>
                       </td>
                     </tr>
                   ))}
@@ -91,13 +91,13 @@ export default function TransactionsView() {
 
         {open && (
           <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setOpen(false)}>
-            <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0d141b] p-6" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-lg font-semibold text-white mb-4">{editing ? "Editar" : "Novo"} lançamento</h3>
+            <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-lg font-semibold text-foreground mb-4">{editing ? "Editar" : "Novo"} lançamento</h3>
               {err && <p className="mb-3 text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">{err}</p>}
               <div className="grid grid-cols-2 gap-3">
-                <div className="col-span-2 grid grid-cols-2 gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+                <div className="col-span-2 grid grid-cols-2 gap-1 p-1 rounded-lg bg-white/5 border border-border">
                   {(["despesa", "receita"] as const).map((k) => (
-                    <button key={k} type="button" onClick={() => setForm({ ...form, kind: k, category_id: "" })} className={`py-2 rounded-md text-sm font-medium transition ${form.kind === k ? (k === "receita" ? "bg-emerald-500 text-white" : "bg-red-500 text-white") : "text-slate-400"}`}>{k === "receita" ? "Receita" : "Despesa"}</button>
+                    <button key={k} type="button" onClick={() => setForm({ ...form, kind: k, category_id: "" })} className={`py-2 rounded-md text-sm font-medium transition ${form.kind === k ? (k === "receita" ? "bg-emerald-500 text-white" : "bg-red-500 text-white") : "text-muted-foreground"}`}>{k === "receita" ? "Receita" : "Despesa"}</button>
                   ))}
                 </div>
                 <Field label="Descrição" full><input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="inp" placeholder="Mercado, salário…" /></Field>
@@ -107,7 +107,7 @@ export default function TransactionsView() {
                 <Field label="Categoria"><select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="inp"><option value="">—</option>{catsByKind.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></Field>
               </div>
               <div className="flex gap-2 mt-5">
-                <button onClick={() => setOpen(false)} className="flex-1 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-slate-300">Cancelar</button>
+                <button onClick={() => setOpen(false)} className="flex-1 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-muted-foreground">Cancelar</button>
                 <button onClick={save} disabled={saving} className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm disabled:opacity-50">{saving ? "Salvando…" : "Salvar"}</button>
               </div>
             </div>
@@ -120,5 +120,5 @@ export default function TransactionsView() {
 }
 
 function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
-  return <div className={full ? "col-span-2" : ""}><label className="text-xs text-slate-400">{label}</label>{children}</div>
+  return <div className={full ? "col-span-2" : ""}><label className="text-xs text-muted-foreground">{label}</label>{children}</div>
 }

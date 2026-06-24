@@ -4,14 +4,12 @@ import Features from "@/components/base/Features";
 import Pricing from "@/components/base/Pricing";
 import Newsletter from "@/components/base/Newsletter";
 import FAQSection from "@/components/base/FAQSection";
-import DownloadSection from "@/components/base/DownloadSection";
 
 const HomePage = () => {
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
       <div className="relative z-10">
         <Hero />
-        <DownloadSection />
         <Brands />
         <Features />
         <Pricing />
@@ -22,4 +20,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;
