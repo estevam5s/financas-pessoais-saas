@@ -8,104 +8,68 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as TwoFactorAuthRouteImport } from './routes/two-factor-auth'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppTransactionsRouteImport } from './routes/app.transactions'
+import { Route as AppBillingRouteImport } from './routes/app.billing'
+import { Route as AppAdminRouteImport } from './routes/app.admin'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as TwoFactorAuthImport } from './routes/two-factor-auth'
-import { Route as RegisterImport } from './routes/register'
-import { Route as LoginImport } from './routes/login'
-import { Route as ForgotPasswordImport } from './routes/forgot-password'
-import { Route as ContactImport } from './routes/contact'
-import { Route as IndexImport } from './routes/index'
-
-// Create/Update Routes
-
-const TwoFactorAuthRoute = TwoFactorAuthImport.update({
+const TwoFactorAuthRoute = TwoFactorAuthRouteImport.update({
   id: '/two-factor-auth',
   path: '/two-factor-auth',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const RegisterRoute = RegisterImport.update({
+const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LoginRoute = LoginImport.update({
+const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ForgotPasswordRoute = ForgotPasswordImport.update({
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ContactRoute = ContactImport.update({
+const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactImport
-      parentRoute: typeof rootRoute
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordImport
-      parentRoute: typeof rootRoute
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterImport
-      parentRoute: typeof rootRoute
-    }
-    '/two-factor-auth': {
-      id: '/two-factor-auth'
-      path: '/two-factor-auth'
-      fullPath: '/two-factor-auth'
-      preLoaderRoute: typeof TwoFactorAuthImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppTransactionsRoute = AppTransactionsRouteImport.update({
+  id: '/app/transactions',
+  path: '/app/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppBillingRoute = AppBillingRouteImport.update({
+  id: '/app/billing',
+  path: '/app/billing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/app/admin',
+  path: '/app/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -114,8 +78,11 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/two-factor-auth': typeof TwoFactorAuthRoute
+  '/app/admin': typeof AppAdminRoute
+  '/app/billing': typeof AppBillingRoute
+  '/app/transactions': typeof AppTransactionsRoute
+  '/app/': typeof AppIndexRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
@@ -123,18 +90,24 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/two-factor-auth': typeof TwoFactorAuthRoute
+  '/app/admin': typeof AppAdminRoute
+  '/app/billing': typeof AppBillingRoute
+  '/app/transactions': typeof AppTransactionsRoute
+  '/app': typeof AppIndexRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/two-factor-auth': typeof TwoFactorAuthRoute
+  '/app/admin': typeof AppAdminRoute
+  '/app/billing': typeof AppBillingRoute
+  '/app/transactions': typeof AppTransactionsRoute
+  '/app/': typeof AppIndexRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -144,6 +117,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/two-factor-auth'
+    | '/app/admin'
+    | '/app/billing'
+    | '/app/transactions'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,6 +129,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/two-factor-auth'
+    | '/app/admin'
+    | '/app/billing'
+    | '/app/transactions'
+    | '/app'
   id:
     | '__root__'
     | '/'
@@ -160,9 +141,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/two-factor-auth'
+    | '/app/admin'
+    | '/app/billing'
+    | '/app/transactions'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactRoute: typeof ContactRoute
@@ -170,6 +154,85 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   TwoFactorAuthRoute: typeof TwoFactorAuthRoute
+  AppAdminRoute: typeof AppAdminRoute
+  AppBillingRoute: typeof AppBillingRoute
+  AppTransactionsRoute: typeof AppTransactionsRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/two-factor-auth': {
+      id: '/two-factor-auth'
+      path: '/two-factor-auth'
+      fullPath: '/two-factor-auth'
+      preLoaderRoute: typeof TwoFactorAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/app'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/transactions': {
+      id: '/app/transactions'
+      path: '/app/transactions'
+      fullPath: '/app/transactions'
+      preLoaderRoute: typeof AppTransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/billing': {
+      id: '/app/billing'
+      path: '/app/billing'
+      fullPath: '/app/billing'
+      preLoaderRoute: typeof AppBillingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/admin': {
+      id: '/app/admin'
+      path: '/app/admin'
+      fullPath: '/app/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -179,44 +242,11 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   TwoFactorAuthRoute: TwoFactorAuthRoute,
+  AppAdminRoute: AppAdminRoute,
+  AppBillingRoute: AppBillingRoute,
+  AppTransactionsRoute: AppTransactionsRoute,
+  AppIndexRoute: AppIndexRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/contact",
-        "/forgot-password",
-        "/login",
-        "/register",
-        "/two-factor-auth"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/contact": {
-      "filePath": "contact.tsx"
-    },
-    "/forgot-password": {
-      "filePath": "forgot-password.tsx"
-    },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/register": {
-      "filePath": "register.tsx"
-    },
-    "/two-factor-auth": {
-      "filePath": "two-factor-auth.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

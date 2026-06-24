@@ -1,61 +1,150 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import ScrollToTop from "@/hooks/ScrollToTop";
-import { Link } from "@tanstack/react-router";
+import { useState, useEffect, useRef } from "react"
+import { useNavigate, useSearch } from "@tanstack/react-router"
+import { useAuth } from "@/context/authContext"
+import { Eye, EyeOff, Mail, Lock, User, Loader2, Wallet, Check } from "lucide-react"
 
-const LoginPage = () => {
-    return (
-        <>
-            <ScrollToTop />
-            <section className="py-16 min-h-screen flex items-center justify-center">
-                <div className="container max-w-lg mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white text-center">
-                        Sign In
-                    </h2>
-                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 text-center">
-                        Welcome back! Please login to your account.
-                    </p>
-                    <form className="mt-8 space-y-6">
-                        <div className="space-y-4">
-                            <Input
-                                className="w-full"
-                                type="email"
-                                placeholder="Email"
-                            />
-                            <Input
-                                className="w-full"
-                                type="password"
-                                placeholder="Password"
-                            />
-                        </div>
-                        <Button className="w-full mt-6" type="submit">
-                            Sign In
-                        </Button>
-                    </form>
-                    <div className="mt-6 flex items-center justify-between">
-                        <Link to="/forgot-password" className="text-blue-600 dark:text-blue-400 hover:underline">
-                            Forgot Password?
-                        </Link>
-                        <Link to="/two-factor-auth" className="text-blue-600 dark:text-blue-400 hover:underline">
-                            Two-Factor Authentication
-                        </Link>
-                    </div>
-                    <div className="mt-6 flex flex-col space-y-4">
-                        <Button className="w-full flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-900 text-white">
-                            <svg className="w-5 h-5" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.49933 0.25C3.49635 0.25 0.25 3.49593 0.25 7.50024C0.25 10.703 2.32715 13.4206 5.2081 14.3797C5.57084 14.446 5.70302 14.2222 5.70302 14.0299C5.70302 13.8576 5.69679 13.4019 5.69323 12.797C3.67661 13.235 3.25112 11.825 3.25112 11.825C2.92132 10.9874 2.44599 10.7644 2.44599 10.7644C1.78773 10.3149 2.49584 10.3238 2.49584 10.3238C3.22353 10.375 3.60629 11.0711 3.60629 11.0711C4.25298 12.1788 5.30335 11.8588 5.71638 11.6732C5.78225 11.205 5.96962 10.8854 6.17658 10.7043C4.56675 10.5209 2.87415 9.89918 2.87415 7.12104C2.87415 6.32925 3.15677 5.68257 3.62053 5.17563C3.54576 4.99226 3.29697 4.25521 3.69174 3.25691C3.69174 3.25691 4.30015 3.06196 5.68522 3.99973C6.26337 3.83906 6.8838 3.75895 7.50022 3.75583C8.1162 3.75895 8.73619 3.83906 9.31523 3.99973C10.6994 3.06196 11.3069 3.25691 11.3069 3.25691C11.7026 4.25521 11.4538 4.99226 11.3795 5.17563C11.8441 5.68257 12.1245 6.32925 12.1245 7.12104C12.1245 9.9063 10.4292 10.5192 8.81452 10.6985C9.07444 10.9224 9.30633 11.3648 9.30633 12.0413C9.30633 13.0102 9.29742 13.7922 9.29742 14.0299C9.29742 14.2239 9.42828 14.4496 9.79591 14.3788C12.6746 13.4179 14.75 10.7025 14.75 7.50024C14.75 3.49593 11.5036 0.25 7.49933 0.25Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
-                            Sign In with GitHub
-                        </Button>
-                    </div>
-                    <p className="mt-4 text-sm text-gray-600 dark:text-gray-400 text-center">
-                        Don't have an account?{" "}
-                        <Link to="/register" className="text-blue-600 dark:text-blue-400 hover:underline">
-                            Register
-                        </Link>
-                    </p>
-                </div>
-            </section>
-        </>
-    );
-};
+function EyeBall({ size = 22, pupil = 9, max = 6, blink = false, cover = false }: { size?: number; pupil?: number; max?: number; blink?: boolean; cover?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [m, setM] = useState({ x: 0, y: 0 })
+  useEffect(() => { const h = (e: MouseEvent) => setM({ x: e.clientX, y: e.clientY }); window.addEventListener("mousemove", h); return () => window.removeEventListener("mousemove", h) }, [])
+  let px = 0, py = 0
+  if (ref.current && !cover) {
+    const r = ref.current.getBoundingClientRect()
+    const dx = m.x - (r.left + r.width / 2), dy = m.y - (r.top + r.height / 2)
+    const dist = Math.min(Math.sqrt(dx * dx + dy * dy), max); const a = Math.atan2(dy, dx)
+    px = Math.cos(a) * dist; py = Math.sin(a) * dist
+  }
+  const closed = blink || cover
+  return (
+    <div ref={ref} className="rounded-full flex items-center justify-center transition-all duration-150" style={{ width: size, height: closed ? 2 : size, backgroundColor: "white", overflow: "hidden" }}>
+      {!closed && <div className="rounded-full" style={{ width: pupil, height: pupil, backgroundColor: "#064e3b", transform: `translate(${px}px, ${py}px)`, transition: "transform 0.1s ease-out" }} />}
+    </div>
+  )
+}
 
-export default LoginPage; 
+function Character({ color, left, width, height, blink, cover, faceTop = 46 }: { color: string; left: number; width: number; height: number; blink: boolean; cover?: boolean; faceTop?: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [m, setM] = useState({ x: 0, y: 0 })
+  useEffect(() => { const h = (e: MouseEvent) => setM({ x: e.clientX, y: e.clientY }); window.addEventListener("mousemove", h); return () => window.removeEventListener("mousemove", h) }, [])
+  let skew = 0, fx = 0, fy = 0
+  if (ref.current) {
+    const r = ref.current.getBoundingClientRect()
+    const dx = m.x - (r.left + r.width / 2), dy = m.y - (r.top + r.height / 3)
+    skew = Math.max(-6, Math.min(6, -dx / 120)); fx = Math.max(-12, Math.min(12, dx / 22)); fy = Math.max(-8, Math.min(8, dy / 32))
+  }
+  return (
+    <div ref={ref} className="absolute bottom-0 transition-all duration-500 ease-in-out" style={{ left, width, height, backgroundColor: color, borderRadius: "12px 12px 0 0", transform: `skewX(${skew}deg)`, transformOrigin: "bottom center" }}>
+      <div className="absolute flex gap-5 transition-all duration-300" style={{ left: width / 2 - 26 + fx, top: faceTop + fy }}>
+        <EyeBall blink={blink} cover={cover} /><EyeBall blink={blink} cover={cover} />
+      </div>
+    </div>
+  )
+}
+
+function useBlink() {
+  const [b, setB] = useState(false)
+  useEffect(() => { let t: any; const loop = () => { t = setTimeout(() => { setB(true); setTimeout(() => { setB(false); loop() }, 150) }, Math.random() * 4000 + 3000) }; loop(); return () => clearTimeout(t) }, [])
+  return b
+}
+
+const PERKS = [
+  "7 dias grátis com acesso Pro — sem cartão",
+  "Contas, lançamentos e categorias",
+  "Orçamentos, metas e relatórios",
+  "Tudo em um painel, em português",
+]
+
+export default function LoginPage() {
+  const navigate = useNavigate()
+  const search = useSearch({ strict: false }) as any
+  const { signIn, signUp } = useAuth()
+  const [mode, setMode] = useState<"login" | "signup">(search?.mode === "signup" ? "signup" : "login")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [name, setName] = useState("")
+  const [showPass, setShowPass] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const blinkA = useBlink(), blinkB = useBlink()
+  const coverEyes = password.length > 0 && !showPass
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null); setLoading(true)
+    const { error } = mode === "login" ? await signIn(email, password) : await signUp(email, password, name)
+    setLoading(false)
+    if (error) { setError(error.message?.includes("Invalid login") ? "E-mail ou senha incorretos." : (error.message || "Falha na autenticação.")); return }
+    navigate({ to: "/app" })
+  }
+
+  return (
+    <div className="min-h-screen grid lg:grid-cols-2 bg-[#0a0f14] text-white">
+      <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden bg-gradient-to-br from-emerald-500/90 via-emerald-600 to-[#04261b]">
+        <div className="relative z-20 flex items-center gap-2 text-lg font-semibold text-white">
+          <div className="size-9 rounded-lg bg-white/15 backdrop-blur flex items-center justify-center"><Wallet className="size-5" /></div>
+          <span>FinControl</span>
+        </div>
+        <div className="relative z-20 flex items-end justify-center h-[440px]">
+          <div className="relative" style={{ width: 480, height: 400 }}>
+            <Character color="#064e3b" left={20} width={160} height={360} blink={blinkB} faceTop={50} />
+            <Character color="#10b981" left={200} width={190} height={400} blink={blinkA} cover={coverEyes} faceTop={48} />
+          </div>
+        </div>
+        <div className="relative z-20 text-white/90 max-w-md">
+          <h2 className="text-2xl font-bold text-white">Suas finanças, sob controle.</h2>
+          <ul className="mt-4 space-y-2">
+            {PERKS.map((p) => (<li key={p} className="flex items-start gap-2 text-sm text-white/85"><Check className="size-4 mt-0.5 shrink-0 text-white" /> {p}</li>))}
+          </ul>
+        </div>
+        <div className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-300/25 blur-3xl" />
+      </div>
+
+      <div className="flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm">
+          <div className="lg:hidden flex items-center gap-2 text-white font-semibold mb-8"><Wallet className="size-6 text-emerald-400" /> FinControl</div>
+          <h1 className="text-2xl font-semibold text-white">{mode === "login" ? "Entrar" : "Criar conta"}</h1>
+          <p className="text-sm text-slate-500 mt-1">{mode === "login" ? "Acesse seu painel financeiro." : "Comece com 7 dias grátis no nível Pro."}</p>
+
+          <div className="mt-6 grid grid-cols-2 gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+            {(["login", "signup"] as const).map((m) => (
+              <button key={m} onClick={() => { setMode(m); setError(null) }} className={`py-2 rounded-md text-sm font-medium transition ${mode === m ? "bg-emerald-500 text-white" : "text-slate-400 hover:text-white"}`}>
+                {m === "login" ? "Login" : "Registro"}
+              </button>
+            ))}
+          </div>
+
+          {error && <p className="mt-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
+
+          <form onSubmit={handleSubmit} className="mt-5 space-y-3">
+            {mode === "signup" && (
+              <Field icon={<User className="size-4" />}>
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome" required className="w-full bg-transparent outline-none text-white placeholder-slate-500 text-sm" />
+              </Field>
+            )}
+            <Field icon={<Mail className="size-4" />}>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" required autoComplete="email" className="w-full bg-transparent outline-none text-white placeholder-slate-500 text-sm" />
+            </Field>
+            <Field icon={<Lock className="size-4" />}>
+              <input type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete={mode === "login" ? "current-password" : "new-password"} className="w-full bg-transparent outline-none text-white placeholder-slate-500 text-sm" />
+              <button type="button" onClick={() => setShowPass(!showPass)} className="text-slate-500 hover:text-white">{showPass ? <EyeOff className="size-4" /> : <Eye className="size-4" />}</button>
+            </Field>
+            <button type="submit" disabled={loading} className="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm transition disabled:opacity-60 flex items-center justify-center gap-2">
+              {loading && <Loader2 className="size-4 animate-spin" />}{mode === "login" ? "Entrar" : "Criar conta grátis"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-xs text-slate-600">Ao continuar você concorda com os termos. <a href="/" className="text-emerald-400 hover:underline">Voltar ao site</a></p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Field({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 focus-within:border-emerald-500/50 transition">
+      <span className="text-slate-500">{icon}</span>{children}
+    </div>
+  )
+}

@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-// NOT: Burada gerçek bileşeni import edilecek
+// Cadastro unificado em /login (abas Login/Registro).
 export const Route = createFileRoute('/register')({
-  component: () => <div>Register sayfası - Yapım aşamasında</div>,
-}) 
+  beforeLoad: () => { throw redirect({ to: '/login', search: { mode: 'signup' } }) },
+})

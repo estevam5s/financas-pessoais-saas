@@ -1,97 +1,70 @@
+import { useEffect, useState } from "react";
 import { CheckIcon } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Button } from "../ui/button";
+import { Link } from "@tanstack/react-router";
 
-const defaultPlans = {
-    monthly: [
-        { title: 'Starter', description: 'Perfect for individuals', price: 9, features: ['1 user', '1 GB storage', 'Basic features'], highlighted: false },
-        { title: 'Pro', description: 'Perfect for small teams', price: 29, features: ['5 users', '10 GB storage', 'Advanced features'], highlighted: true },
-        { title: 'Enterprise', description: 'Perfect for large organizations', price: 99, features: ['Unlimited users', 'Unlimited storage', 'Enterprise features'], highlighted: false }
-    ],
-    yearly: [
-        { title: 'Starter', description: 'Perfect for individuals', price: 99, features: ['1 user', '1 GB storage', 'Basic features'], highlighted: false },
-        { title: 'Pro', description: 'Perfect for small teams', price: 299, features: ['5 users', '10 GB storage', 'Advanced features'], highlighted: true },
-        { title: 'Enterprise', description: 'Perfect for large organizations', price: 999, features: ['Unlimited users', 'Unlimited storage', 'Enterprise features'], highlighted: false }
-    ]
+type Plan = {
+  slug: string; name: string; description?: string;
+  price_month: number; price_year: number; features: string[]; highlighted: boolean;
 };
 
-const Pricing = () => {
+const brl = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 0 });
 
-    return (
-        <div id="pricing">
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-medium text-center mt-10" id="pricing">
-                Pricing
-            </h3>
-            <p className="text-center mt-5 mb-10 text-lg font-normal">
-                Choose a plan that works for you
-            </p>
-            <Tabs className="w-full max-w-4xl mx-auto my-10 mb-16 px-5" defaultValue="monthly">
-                <TabsList className="grid grid-cols-2 max-w-sm mx-auto">
-                    <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                    <TabsTrigger value="yearly">Yearly</TabsTrigger>
-                </TabsList>
-                <TabsContent value="monthly">
-                    <div className="grid md:grid-cols-3 gap-6 mt-10">
-                        {defaultPlans.monthly.map((plan, index) => (
-                            <Card key={index} className={`flex flex-col h-full ${plan.highlighted ? 'border-2 border-red-500' : ''}`}>
-                                <CardHeader>
-                                    <CardTitle>{plan.title}</CardTitle>
-                                    <CardDescription>{plan.description}</CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex-1 flex flex-col justify-between">
-                                    <div>
-                                        <div className="text-4xl font-bold">${plan.price}</div>
-                                        <div className="text-gray-500 dark:text-gray-400">per month</div>
-                                    </div>
-                                    <ul className="space-y-2 text-sm">
-                                        {plan.features.map((feature, i) => (
-                                            <li key={i}>
-                                                <CheckIcon className="w-4 h-4 mr-2 inline-block text-primary" />
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button className="w-full">Get Started</Button>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                </TabsContent>
-                <TabsContent value="yearly">
-                    <div className="grid md:grid-cols-3 gap-6 mt-10">
-                        {defaultPlans.yearly.map((plan, index) => (
-                            <Card key={index} className={`flex flex-col h-full ${plan.highlighted ? 'border-2 border-red-500' : ''}`}>
-                                <CardHeader>
-                                    <CardTitle>{plan.title}</CardTitle>
-                                    <CardDescription>{plan.description}</CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex-1 flex flex-col justify-between">
-                                    <div>
-                                        <div className="text-4xl font-bold">${plan.price}</div>
-                                        <div className="text-gray-500 dark:text-gray-400">per year</div>
-                                    </div>
-                                    <ul className="space-y-2 text-sm">
-                                        {plan.features.map((feature, i) => (
-                                            <li key={i}>
-                                                <CheckIcon className="w-4 h-4 mr-2 inline-block text-primary" />
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button className="w-full">Get Started</Button>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                </TabsContent>
-            </Tabs>
+const FALLBACK: Plan[] = [
+  { slug: "inicial", name: "Inicial", description: "Começar / testar", price_month: 0, price_year: 0, highlighted: false, features: ["2 contas", "Até 50 transações/mês", "5 categorias", "Relatórios básicos"] },
+  { slug: "starter", name: "Starter", description: "Controle pessoal", price_month: 1200, price_year: 11500, highlighted: false, features: ["Até 5 contas", "500 transações/mês", "Categorias ilimitadas", "Orçamentos e metas", "Exportação CSV"] },
+  { slug: "pro", name: "Pro", description: "Quem leva a sério", price_month: 2400, price_year: 23000, highlighted: true, features: ["Contas ilimitadas", "Transações ilimitadas", "Orçamentos e metas ilimitados", "Relatórios avançados", "Exportação CSV/Excel"] },
+  { slug: "familia", name: "Família", description: "Casais e famílias", price_month: 3900, price_year: 37400, highlighted: false, features: ["Tudo do Pro", "Até 5 membros", "Orçamento compartilhado", "Visão consolidada"] },
+];
+
+const Pricing = () => {
+  const [plans, setPlans] = useState<Plan[]>(FALLBACK);
+  const [cycle, setCycle] = useState<"month" | "year">("month");
+
+  useEffect(() => {
+    fetch("/api/plans").then((r) => r.json()).then((d) => { if (d.plans?.length) setPlans(d.plans); }).catch(() => {});
+  }, []);
+
+  return (
+    <div id="pricing" className="py-16 px-5">
+      <h3 className="text-3xl md:text-4xl lg:text-5xl font-medium text-center mt-6">Planos e preços</h3>
+      <p className="text-center mt-4 mb-6 text-lg font-normal text-muted-foreground">
+        Comece com 7 dias grátis no nível Pro. Cancele quando quiser — reembolso de 7 dias. Sem cobrança por armazenamento.
+      </p>
+
+      <div className="flex justify-center mb-10">
+        <div className="inline-flex items-center gap-1 p-1 rounded-full border bg-card">
+          <button onClick={() => setCycle("month")} className={`px-5 py-1.5 rounded-full text-sm transition ${cycle === "month" ? "bg-emerald-500 text-white font-medium" : "text-muted-foreground"}`}>Mensal</button>
+          <button onClick={() => setCycle("year")} className={`px-5 py-1.5 rounded-full text-sm transition flex items-center gap-1.5 ${cycle === "year" ? "bg-emerald-500 text-white font-medium" : "text-muted-foreground"}`}>Anual <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-500">−20%</span></button>
         </div>
-    );
-}
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
+        {plans.map((p) => {
+          const price = cycle === "year" ? p.price_year : p.price_month;
+          const free = p.slug === "inicial";
+          return (
+            <div key={p.slug} className={`relative flex flex-col rounded-2xl border p-6 ${p.highlighted ? "border-emerald-500/50 bg-emerald-500/[0.05] shadow-lg" : "bg-card"}`}>
+              {p.highlighted && <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-medium px-3 py-1 rounded-full bg-emerald-500 text-white">Mais popular</span>}
+              <h4 className="text-lg font-bold">{p.name}</h4>
+              {p.description && <p className="text-xs text-muted-foreground mt-1">{p.description}</p>}
+              <div className="mt-3 flex items-end gap-1">
+                <span className="text-3xl font-bold">{free ? "R$ 0" : brl(cycle === "year" ? Math.round(price / 12) : price)}</span>
+                {!free && <span className="text-muted-foreground text-sm mb-1">/mês</span>}
+              </div>
+              {!free && cycle === "year" && <p className="text-xs text-muted-foreground mt-1">{brl(price)}/ano</p>}
+              <Link to="/login" search={{ mode: "signup" }} className={`mt-5 w-full py-2.5 rounded-lg text-sm font-medium transition text-center ${p.highlighted ? "bg-emerald-500 text-white hover:bg-emerald-600" : "bg-muted hover:bg-muted/70"}`}>
+                {free ? "Começar grátis" : "Assinar"}
+              </Link>
+              <ul className="mt-6 space-y-2.5 text-sm flex-1">
+                {p.features.map((f, i) => (<li key={i} className="flex gap-2"><CheckIcon className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" /><span>{f}</span></li>))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-8 text-center text-xs text-muted-foreground">Pagamento seguro via Stripe · Nota fiscal automática · Garantia de reembolso de 7 dias</p>
+    </div>
+  );
+};
 
 export default Pricing;

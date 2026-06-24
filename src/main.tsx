@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import { ThemeProvider } from './context/themeContext.tsx'
+import { AuthProvider } from './context/authContext.tsx'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 
@@ -22,7 +23,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <ThemeProvider defaultTheme="dark" storageKey="app-ui-theme">
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </ThemeProvider>
     </StrictMode>
   )
@@ -31,7 +34,9 @@ if (!rootElement.innerHTML) {
     rootElement,
     <StrictMode>
       <ThemeProvider defaultTheme="dark" storageKey="app-ui-theme">
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </ThemeProvider>
     </StrictMode>
   )
